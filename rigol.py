@@ -25,14 +25,15 @@ class Rigol():
             else:
                 return self.ask(":measure:" + characteristic + "?")    
         else:
-            self.write(":measure:" + characteristic + ":" + flow + " " + samplingRate)
+            self.write(":rate:" + characteristic + ":" + flow + " " + samplingRate)
             self.write(":measure:" + characteristic + ":" + flow + " " + str(range))
+
             try:
-            while True:
-                if(flow):
-                    return self.ask(":measure:" + characteristic + ":" + flow)
-                else:
-                    return self.ask(":measure:" + characteristic)    
+                while True:
+                    if(flow):
+                        print(self.getMeasurement("current", characteristic, flow, samplingRate, range))
+                    else:
+                        print(self.ask("current", characteristic, flow, samplingRate, range))
             except KeyboardInterrupt:
                 pass
 
