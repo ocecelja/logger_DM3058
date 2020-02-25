@@ -1,10 +1,32 @@
 #!/usr/bin/env python3
 
 import usbtmc
+import threading
+import time
 
 class Rigol():
+    def threadRead(self):
+        while True:
+            # time.sleep(1)
+            if (self.continuousMeasure):
+                try:
+                    readData = self.measure("current", self.characteristic, self.flow, self.samplingRate, self.range)
+                    if (readData.strip()):
+                        print(readData)
+                except:
+                    pass
+
     def __init__(self):
         self.instr = usbtmc.Instrument(0x1ab1, 0x09c4)
+        self.thread = threading.Thread(target=self.threadRead)
+        self.continuousMeasure = False
+        self.thread.start()
+
+    def setMeasureFlag(self):
+        self.continuousMeasure = True
+
+    def destroyMeasureFlag(self):
+        self.continuousMeasure = False
 
     def ask(self, string):
         return self.instr.ask(string)
@@ -18,7 +40,7 @@ class Rigol():
     def getId(self):
         return self.ask("*IDN?")
 
-    def getMeasurement(self, measurementType = "current", characteristic = "current", flow = "dc", samplingRate = "s", range = "2")
+    def measure(self, measurementType = "current", characteristic = "current", flow = "dc", samplingRate = "s", range = "2"):
         if(str(measurementType) == "current"):
             if(flow):
                 return self.ask(":measure:" + characteristic + ":" + flow + "?")
@@ -28,62 +50,17 @@ class Rigol():
             self.write(":rate:" + characteristic + ":" + flow + " " + samplingRate)
             self.write(":measure:" + characteristic + ":" + flow + " " + str(range))
 
-            try:
-                while True:
-                    if(flow):
-                        print(self.getMeasurement("current", characteristic, flow, samplingRate, range))
-                    else:
-                        print(self.ask("current", characteristic, flow, samplingRate, range))
-            except KeyboardInterrupt:
-                pass
+            self.setMeasureFlag()
+            self.characteristic = characteristic
+            self.samplingRate = samplingRate
+            self.flow = flow
+            self.range = range
+            self.setMeasureFlag()
 
-    # def getCurrentCurrentDc(self):
-    #     return self.ask(":measure:current:dc?")
-
-    # def getCurrentVoltagetDc(self):
-    #     return self.ask(":measure:voltage:dc?")
-
-    # def getContinuousVoltagetDc(self, samplingRate = "s", range = "2"):
-    #     self.write(":rate:voltage:dc " + samplingRate)
-    #     self.write(":measure:voltage:dc " + str(range))
-    #     try:
-    #         while True:
-    #             print(self.getCurrentVoltagetDc())
-    #     except KeyboardInterrupt:
-    #         pass
-
-    # def getContinuousCurrenttDc(self, samplingRate = "s", range = "2"):
-    #     self.write(":rate:current:dc " + samplingRate)
-    #     self.write(":measure:current:dc " + str(range))
-    #     try:
-    #         while True:
-    #             print(self.getCurrentCurrentDc())
-    #     except KeyboardInterrupt:
-    #         pass
-
-    # def getCurrentCurrentAc(self):
-    #     return self.ask(":measure:current:ac?")
-
-    # def getCurrentVoltagetAc(self):
-    #     return self.ask(":measure:voltage:ac?")
-
-    # def getContinuousVoltagetDc(self, samplingRate = "s", range = "2"):
-    #     self.write(":rate:voltage:ac " + samplingRate)
-    #     self.write(":measure:voltage:ac " + str(range))
-    #     try:
-    #         while True:
-    #             print(self.getCurrentVoltagetAc())
-    #     except KeyboardInterrupt:
-    #         pass
-
-    # def getContinuousCurrenttAc(self, samplingRate = "s", range = "2"):
-    #     self.write(":rate:current:ac " + samplingRate)
-    #     self.write(":measure:current:ac " + str(range))
-    #     try:
-    #         while True:
-    #             print(self.getCurrentCurrentAc())
-    #     except KeyboardInterrupt:
-    #         pass
+    def calculateStatistic(self, measurementType = "single", value = "min"):
+        if(str(measurementType) == "single"):
+            self.write(":calculate:function " + value)
+            return self.ask(":calculate:statistic:" + value + "?")
 
 if __name__ == "__main__":
     rigol = Rigol()
