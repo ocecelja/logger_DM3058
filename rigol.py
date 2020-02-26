@@ -10,7 +10,7 @@ class Rigol():
             # time.sleep(1)
             if (self.continuousMeasure):
                 try:
-                    readData = self.measure("current", self.characteristic, self.flow, self.samplingRate, self.range)
+                    readData = self.measure("single", self.characteristic, self.flow)
                     if (readData.strip()):
                         print(readData)
                 except:
@@ -21,6 +21,9 @@ class Rigol():
         self.thread = threading.Thread(target=self.threadRead)
         self.continuousMeasure = False
         self.thread.start()
+        self.measure()
+        self.setRange()
+        self.setRate()
 
     def setMeasureFlag(self):
         self.continuousMeasure = True
@@ -40,27 +43,41 @@ class Rigol():
     def getId(self):
         return self.ask("*IDN?")
 
-    def measure(self, measurementType = "current", characteristic = "current", flow = "dc", samplingRate = "s", range = "2"):
-        if(str(measurementType) == "current"):
-            if(flow):
-                return self.ask(":measure:" + characteristic + ":" + flow + "?")
-            else:
-                return self.ask(":measure:" + characteristic + "?")    
-        else:
-            self.write(":rate:" + characteristic + ":" + flow + " " + samplingRate)
-            self.write(":measure:" + characteristic + ":" + flow + " " + str(range))
+    def measure(self, measurementType = "single", characteristic = "voltage", flow = "dc", measurementRange = "2"):
+        self.measurementType = measurementType
+        self.characteristic = characteristic
+        self.flow = flow
 
-            self.setMeasureFlag()
-            self.characteristic = characteristic
-            self.samplingRate = samplingRate
-            self.flow = flow
-            self.range = range
-            self.setMeasureFlag()
-
-    def calculateStatistic(self, measurementType = "single", value = "min"):
         if(str(measurementType) == "single"):
-            self.write(":calculate:function " + value)
-            return self.ask(":calculate:statistic:" + value + "?")
+            if(flow):
+                return self.ask(":measure:" + self.characteristic + ":" + self.flow + "?")
+            else:
+                return self.ask(":measure:" + self.characteristic + "?")    
+        else:
+            self.setMeasureFlag()
+    
+    def getStatistic(self):
+        return self.ask(":calculate:statistic:" + self.description + "?")
+
+    def setStatistic(self, description = "min"):
+        self.description = description
+        self.write(":calculate:function " + self.description)
+    
+    def setRate(self, samplingRate = "s"):
+        self.samplingRate = samplingRate
+
+        if(self.flow):
+            self.write(":rate:" + self.characteristic + ":" + self.flow + " " + self.samplingRate)
+        else:
+            self.write(":rate:" + self.characteristic + " " + self.samplingRate)
+
+    def setRange(self, measurementRange = "2"):
+        self.measurementRange = measurementRange
+
+        if(self.flow):
+            self.write(":measure:" + self.characteristic + ":" + self.flow + " " + self.measurementRange)
+        else:
+            self.write(":measure:" + self.characteristic + " " + slef.measurementRange)
 
 if __name__ == "__main__":
     rigol = Rigol()
