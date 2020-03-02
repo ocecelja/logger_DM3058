@@ -1,0 +1,15 @@
+Bus 002 Device 002: ID 2109:0813 VIA Labs, Inc. USB3.0 Hub
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 008: ID 0408:a060 Quanta Computer, Inc. HD Webcam
+Bus 001 Device 006: ID 04ca:3016 Lite-On Technology Corp. 
+Bus 001 Device 007: ID 03f0:0941 HP, Inc X500 Optical Mouse
+Bus 001 Device 005: ID 0424:2514 Microchip Technology, Inc. (formerly SMSC) USB 2.0 Hub
+Bus 001 Device 013: ID 1ab1:09c4 Rigol Technologies DM3000 SERIES 
+Bus 001 Device 012: ID 045e:070f Microsoft Corp. LifeChat LX-3000 Headset
+Bus 001 Device 011: ID 10c4:ea60 Silicon Labs CP210x UART Bridge
+Bus 001 Device 009: ID 1e7d:2fa8 ROCCAT 
+Bus 001 Device 004: ID 2109:0100 VIA Labs, Inc. 
+Bus 001 Device 002: ID 2109:2813 VIA Labs, Inc. USB2.0 Hub
+Bus 001 Device 010: ID 04f3:0c03 Elan Microelectronics Corp. ELAN:Fingerprint
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+

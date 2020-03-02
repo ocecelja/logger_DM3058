@@ -3,6 +3,7 @@
 import usbtmc
 import threading
 import time
+import subprocess
 
 class Rigol():
     def threadRead(self):
@@ -16,8 +17,21 @@ class Rigol():
                 except:
                     pass
 
+    def getInstrumentIdList(self):
+        process = subprocess.run(['lsusb'], 
+                         stdout=subprocess.PIPE, 
+                         universal_newlines=True)
+        flsusbReturn = process.stdout
+        flsusbReturnList = flsusbReturn.split()
+        for x in flsusbReturnList:
+            if (x == "Rigol" or x == "rigol"):
+                instrumentId = flsusbReturnList[flsusbReturnList.index(x) - 1]
+                instrumentIdList = instrumentId.split(':')
+                return instrumentIdList
+
     def __init__(self):
-        self.instr = usbtmc.Instrument(0x1ab1, 0x09c4)
+        self.instrumentIdList = self.getInstrumentIdList()
+        self.instr = usbtmc.Instrument(int(self.instrumentIdList[0], 16), int(self.instrumentIdList[1], 16))
         self.thread = threading.Thread(target=self.threadRead)
         self.continuousMeasure = False
         self.thread.start()
@@ -43,7 +57,7 @@ class Rigol():
     def getId(self):
         return self.ask("*IDN?")
 
-    def measure(self, measurementType = "single", characteristic = "voltage", flow = "dc", measurementRange = "2"):
+    def measure(self, measurementType = "single", characteristic = "voltage", flow = "dc"):
         self.measurementType = measurementType
         self.characteristic = characteristic
         self.flow = flow
