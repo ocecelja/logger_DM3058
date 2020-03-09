@@ -15,7 +15,7 @@ self.instr = usbtmc.Instrument("your device Id")
 ```
 "your device Id" you can obtain by running ```lsusb``` on linux OS or using device manager on Windows.
 
-#Running the script
+# Running the script
 You can start script by running ```sudo python -i rigol.py```. Using it should be straight forward, just take a look at script itself and documentation. All default values are set: single measuremnt of dc voltage at slow sampling rate with range of 20V.
 
 After starting the script, every command can be called via ```rigol.name_of_command(command_arguments)```.
